@@ -67,7 +67,17 @@ public:
   ///* Sigma point spreading parameter
   double lambda_;
 
+  //set measurement dimension, radar can measure r, phi, and r_dot
+   int n_z_ ;
 
+   //
+   MatrixXd Zsig_;
+
+   MatrixXd R_laser_;
+   MatrixXd H_laser_;
+   MatrixXd R_radar_;
+   float nis_laser_;
+   float nis_radar_;
   /**
    * Constructor
    */
@@ -102,6 +112,45 @@ public:
    * @param meas_package The measurement at k+1
    */
   void UpdateRadar(MeasurementPackage meas_package);
+
+
+  /**
+   * Create augumented mean state, augumented covarience matrix and square root matrix
+   * @param augumented sigma points
+   */
+  void AugmentedSigmaPoints(MatrixXd* Xsig_out);
+
+  /**
+     * create Predict Sigma points
+     * @param augumented sigma points
+     * Return : Predicted Sigma point Matrix at delta_t time
+   */
+  MatrixXd SigmaPointPrediction(MatrixXd Xsig_aug, double delta_t);
+
+  /**
+	 * Calculate predicted state mean and state covariance matrix
+   */
+  void PredictMeanAndCovariance();
+
+  /**
+  	 * Calculate mean predicted measurement and  measurement covariance matrix.
+  	 * First need to transform sigma points into measurement space.
+  	 * @Param : Predicted Measurement mean z , Predicted measurement covariance matrix
+   */
+  void PredictRadarMeasurement(VectorXd* z_out, MatrixXd* S_out);
+
+  /**
+  	 * Normalize yaw angle in range of -PI to PI
+  	 * @param : Andgle
+  	 * Return : Normalized yaw angle
+   */
+  float NormalizePhi(float angle);
+
+  /**
+     Set weight require in calculation of state mean and covarience matrix
+   */
+  void SetWeight();
+
 };
 
 #endif /* UKF_H */
